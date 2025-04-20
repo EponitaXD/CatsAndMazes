@@ -1,7 +1,182 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#6FC4FC"
+    tools:context=".MainActivity">
 
-</LinearLayout>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="24dp"
+        android:paddingBottom="32dp">
+
+        <!-- Leaderboard Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Leader Board"
+            android:fontFamily="@font/caveatbrushregular"
+            android:textSize="40sp"
+            android:textColor="@android:color/white"
+            android:background="@drawable/rounded_button"
+            android:layout_gravity="center_horizontal"
+            android:padding="12dp"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Player Row Template (Repeat for Player 1–5) -->
+        <!-- Player 1 -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="32dp"
+            android:paddingTop="12dp">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/circle_button" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="Player 1"
+                android:gravity="center"
+                android:paddingHorizontal="20dp"
+                android:textColor="@android:color/white"
+                android:background="@drawable/rounded_button"
+                android:fontFamily="@font/caveatbrushregular" />
+        </LinearLayout>
+
+        <!-- Player 2 -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="32dp"
+            android:paddingTop="12dp">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/circle_button" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="Player 2"
+                android:gravity="center"
+                android:paddingHorizontal="20dp"
+                android:textColor="@android:color/white"
+                android:background="@drawable/rounded_button"
+                android:fontFamily="@font/caveatbrushregular" />
+        </LinearLayout>
+
+        <!-- Player 3 -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="32dp"
+            android:paddingTop="12dp">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/circle_button" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="Player 3"
+                android:gravity="center"
+                android:paddingHorizontal="20dp"
+                android:textColor="@android:color/white"
+                android:background="@drawable/rounded_button"
+                android:fontFamily="@font/caveatbrushregular" />
+        </LinearLayout>
+
+        <!-- Player 4 -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="32dp"
+            android:paddingTop="12dp">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/circle_button" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="Player 4"
+                android:gravity="center"
+                android:paddingHorizontal="20dp"
+                android:textColor="@android:color/white"
+                android:background="@drawable/rounded_button"
+                android:fontFamily="@font/caveatbrushregular" />
+        </LinearLayout>
+
+        <!-- Player 5 -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="32dp"
+            android:paddingTop="12dp"
+            android:layout_marginBottom="32dp">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/circle_button" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="Player 5"
+                android:gravity="center"
+                android:paddingHorizontal="20dp"
+                android:textColor="@android:color/white"
+                android:background="@drawable/rounded_button"
+                android:fontFamily="@font/caveatbrushregular" />
+        </LinearLayout>
+
+        <!-- Main Menu Button -->
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Main Menu"
+            android:fontFamily="@font/caveatbrushregular"
+            android:textSize="32sp"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#2B85B8"
+            android:onClick="MainMenu"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp" />
+
+        <ImageView
+            android:layout_width="400dp"
+            android:layout_height="300dp"
+            android:background="@drawable/catnfish"
+            android:gravity="center_horizontal" />
+
+
+    </LinearLayout>
+</ScrollView>

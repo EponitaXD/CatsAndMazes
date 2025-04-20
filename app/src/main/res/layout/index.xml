@@ -1,21 +1,66 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".MainActivity"
-    android:background="#e7dfc2"
-    android:gravity="center">
+    android:background="#6FC4FC"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:layout_width="400dp"
+        android:layout_height="400dp"
+        android:background="@drawable/catmazeslogo"
+        android:gravity="center_horizontal" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight=".015" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Play"
+        android:backgroundTint="#2B85B8"
         android:fontFamily="@font/caveatbrushregular"
-        android:textSize="32sp"
+        android:onClick="startGame"
+        android:text="Play"
         android:textColor="@android:color/white"
-        android:backgroundTint="#bb8044"
-        android:onClick="startGame" />
+        android:textSize="32sp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight=".015" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#2B85B8"
+        android:fontFamily="@font/caveatbrushregular"
+        android:onClick="settings"
+        android:text="Setting"
+        android:textColor="@android:color/white"
+        android:textSize="32sp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight=".015" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#2B85B8"
+        android:fontFamily="@font/caveatbrushregular"
+        android:onClick="leaderboard"
+        android:text="Leaderboard"
+        android:textColor="@android:color/white"
+        android:textSize="32sp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight=".015" />
 </LinearLayout>
