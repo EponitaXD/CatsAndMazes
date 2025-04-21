@@ -25,6 +25,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.media.MediaPlayer;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -36,9 +37,12 @@ import android.os.Handler;
 import androidx.core.content.res.ResourcesCompat;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class GameView extends View {
     // hardcoded mazes
+    int[][] maze0;
+    /*
     int[][] maze0 = {
             {1,1,1,0,0,0,1,0,1,1},
             {0,1,0,1,1,1,1,1,1,0},
@@ -52,6 +56,8 @@ public class GameView extends View {
             {0,0,1,1,1,1,0,0,0,0}
     };
 
+    */
+
     int[][] maze1 = {
             {2, 1, 1},
             {1, 0, 1},
@@ -60,6 +66,10 @@ public class GameView extends View {
 
     // Bitmaps
     Bitmap background, cat, pathBitmap, lightningBitmap, arrowLeft, arrowRight, arrowDown, arrowUp;
+
+    // sounds
+    MediaPlayer[] mpHappy = new MediaPlayer[3];
+    Random rand = new Random();
 
     // Coordinates
     int catX, catY;
@@ -84,11 +94,25 @@ public class GameView extends View {
     Paint textPaint = new Paint();
     Paint backgroundPaint = new Paint();
 
-
     public GameView(Context context) {
         super(context);
         this.context = context;
 
+        MazeGenerator generator = new MazeGenerator("Hard");
+        maze0 = generator.generateMaze();
+        int[] temp = new int[maze0[0].length];
+        for(int[] row : maze0) {
+            for (int element : row) {
+
+                Log.d("MazeGenerator", element + " ");
+            }
+            Log.d("MazeGenerator", "\n");
+        }
+
+        // initialize Sounds
+        mpHappy[0] = MediaPlayer.create(context, R.raw.happycat0);
+        mpHappy[1] = MediaPlayer.create(context, R.raw.happycat1);
+        mpHappy[2] = MediaPlayer.create(context, R.raw.happycat);
         // initialize Bitmaps
         cat = BitmapFactory.decodeResource(getResources(), R.drawable.cat_sprite);
         pathBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grass_sprite_3d);
@@ -192,6 +216,7 @@ public class GameView extends View {
         if (action == MotionEvent.ACTION_DOWN) {
             //Check if the x and y position of the touch is inside the bitmap
             if (rectArrows.contains((int) x, (int) y)) {
+                int temp = rand.nextInt(2);
                 if(rectDown.contains((int) x, (int) y)) {
                     Log.d("TOUCHED", "Down. X: " + x + " Y: " + y);
                     //Bitmap touched
@@ -204,6 +229,7 @@ public class GameView extends View {
                             catX -= dWidth/12;
                             catY += dWidth*27/224;
                             rectCat.set(catX,catY, catX+dWidth/4, catY+dWidth*2363/(4*1796));
+                            mpHappy[temp].start();
                         }
                     }
                     // otherwise do nothing
@@ -220,6 +246,7 @@ public class GameView extends View {
                             catX += dWidth/12;
                             catY -= dWidth*27/224;
                             rectCat.set(catX,catY, catX+dWidth/4, catY+dWidth*2363/(4*1796));
+                            mpHappy[temp].start();
                         }
                     }
                     // otherwise do nothing
@@ -235,6 +262,7 @@ public class GameView extends View {
                             catIndexX--;
                             catX -= dWidth/4;
                             rectCat.set(catX,catY, catX+dWidth/4, catY+dWidth*2363/(4*1796));
+                            mpHappy[temp].start();
                         }
                     }
                     // otherwise do nothing
@@ -250,6 +278,7 @@ public class GameView extends View {
                             catIndexX++;
                             catX += dWidth/4;
                             rectCat.set(catX,catY, catX+dWidth/4, catY+dWidth*2363/(4*1796));
+                            mpHappy[temp].start();
                         }
                     }
                     // otherwise do nothing
