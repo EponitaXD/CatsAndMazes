@@ -1,4 +1,3 @@
-// I need to see how to implement this because it looks like the maze thing was hardcoded in GameView
 package com.example.catsandmazes;
 
 import java.util.*;
@@ -10,7 +9,7 @@ public class MazeGenerator
     private Random rand = new Random();
     private String algorithm;
 
-    public MazeGenerator(String difficulty) // Setting diffculty
+    public MazeGenerator(String difficulty) // Setting difficulty
     {
         switch (difficulty) 
         {
@@ -59,7 +58,7 @@ public class MazeGenerator
     {
         int[][] dirs = {{2, 0}, {-2, 0}, {0, 2}, {0, -2}};
         List<int[]> walls = new ArrayList<>();
-        int r = 1, c = 1;
+        int r = 0, c = 0; // Updated: Start at the top-left corner
         maze[r][c] = 0;
         addWalls(walls, r, c);
 
@@ -89,15 +88,15 @@ public class MazeGenerator
             }
         }
 
-        maze[1][1] = 2;  // Start
-        maze[rows - 2][cols - 2] = 3;  // End
+        maze[0][0] = 2;  // Start
+        maze[rows - 1][cols - 1] = 3;  // End
 
         return maze;
     }
 
     private int[][] generateAldousBroder() 
     {
-        int r = 1, c = 1;
+        int r = 0, c = 0; // Updated: Start at the top-left corner
         maze[r][c] = 0;
         int unvisitedCount = (rows / 2) * (cols / 2) - 1; // Count of unvisited cells
 
@@ -125,8 +124,8 @@ public class MazeGenerator
         }
 
         // Add start (2) and end (3) tiles
-        maze[1][1] = 2;  // Start
-        maze[rows - 2][cols - 2] = 3;  // End
+        maze[0][0] = 2;  // Start
+        maze[rows - 1][cols - 1] = 3;  // End
 
         return maze;
     }
@@ -145,6 +144,6 @@ public class MazeGenerator
 
     private boolean inBounds(int r, int c) 
     {
-        return r > 0 && r < rows - 1 && c > 0 && c < cols - 1;
+        return r >= 0 && r < rows && c >= 0 && c < cols; // Allow edges
     }
 }
