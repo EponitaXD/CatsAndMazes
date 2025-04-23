@@ -109,6 +109,7 @@ public class GameView extends View {
             Log.d("MazeGenerator", "\n");
         }
 
+
         // initialize Sounds
         mpHappy[0] = MediaPlayer.create(context, R.raw.happycat0);
         mpHappy[1] = MediaPlayer.create(context, R.raw.happycat1);
