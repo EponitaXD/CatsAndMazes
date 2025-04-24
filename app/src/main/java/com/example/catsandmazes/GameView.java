@@ -19,6 +19,7 @@ Right now I need to finish the following functionality
 package com.example.catsandmazes;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -41,6 +42,7 @@ import java.util.Random;
 
 public class GameView extends View {
     // hardcoded mazes
+    int[][] mazeSolution = new int[10][10];
     int[][] maze0;
     /*
     int[][] maze0 = {
@@ -55,9 +57,7 @@ public class GameView extends View {
             {1,1,1,0,1,0,1,1,1,1},
             {0,0,1,1,1,1,0,0,0,0}
     };
-
     */
-
     int[][] maze1 = {
             {2, 1, 1},
             {1, 0, 1},
@@ -65,9 +65,9 @@ public class GameView extends View {
     };
 
     // Bitmaps
-    Bitmap background, cat, pathBitmap, lightningBitmap, arrowLeft, arrowRight, arrowDown, arrowUp;
+    Bitmap background, cat, pathBitmap, pathFinalBitmap, lightningBitmap, arrowLeft, arrowRight, arrowDown, arrowUp;
 
-    // sounds
+    // sounds. rand var used to rotate sounds
     MediaPlayer[] mpHappy = new MediaPlayer[3];
     Random rand = new Random();
 
@@ -85,6 +85,7 @@ public class GameView extends View {
     // font vars
     float TEXT_SIZE = 120;
     int energy = 19;
+    int optimalNumSteps = 19;
     // device dimentions
     static int dWidth, dHeight;
     // array to store path instances
@@ -98,7 +99,7 @@ public class GameView extends View {
         super(context);
         this.context = context;
 
-        MazeGenerator generator = new MazeGenerator("Hard");
+        MazeGenerator generator = new MazeGenerator("Easy");
         maze0 = generator.generateMaze();
         int[] temp = new int[maze0[0].length];
         for(int[] row : maze0) {
@@ -108,6 +109,11 @@ public class GameView extends View {
             }
             Log.d("MazeGenerator", "\n");
         }
+        /*FloodFill solve = new FloodFill(maze0);
+        //mazeSolution = solve.getSolution();
+        optimalNumSteps = solve.solve_maze();
+        energy =  (int) (optimalNumSteps* 1.5);
+        */
 
 
         // initialize Sounds
@@ -122,6 +128,7 @@ public class GameView extends View {
         arrowUp = BitmapFactory.decodeResource(getResources(), R.drawable.play_fill_up);
         arrowLeft = BitmapFactory.decodeResource(getResources(), R.drawable.play_fill_left);
         arrowRight = BitmapFactory.decodeResource(getResources(), R.drawable.play_fill_right);
+        pathFinalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grass_sprite_3d_fish);
         Display display = ((Activity) getContext()).getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
@@ -166,17 +173,21 @@ public class GameView extends View {
                 if (j == 0){
                     previousX = pathX;
                 }
-                if (maze0[i][j] > 0) {
+                if(maze0[i][j] == 1) {
                     paths.add(new Path(context, pathBitmap, pathX, pathY, dWidth, maze0[i][j]));
-                    // if it is the start of the maze
-                    // set cat's coordinates
-                    if (maze0[i][j] == 2) {
-                        catIndexX = j;
-                        catIndexY = i;
-                        catX = pathX - 20;
-                        catY = pathY - dWidth*2363/(5*1796);
-                        rectCat.set(catX,catY, catX+dWidth/4, catY+dWidth*2363/(4*1796));
-                    }
+                }
+                // if it is the start of the maze
+                // set cat's coordinates
+                else if (maze0[i][j] == 2) {
+                    paths.add(new Path(context, pathBitmap, pathX, pathY, dWidth, maze0[i][j]));
+                    catIndexX = j;
+                    catIndexY = i;
+                    catX = pathX - 20;
+                    catY = pathY - dWidth*2363/(5*1796);
+                    rectCat.set(catX,catY, catX+dWidth/4, catY+dWidth*2363/(4*1796));
+                }
+                else if (maze0[i][j] == 3) {
+                    paths.add(new Path(context, pathFinalBitmap, pathX, pathY, dWidth, maze0[i][j]));
                 }
                 pathX += dWidth/4;
             }
@@ -192,7 +203,7 @@ public class GameView extends View {
         canvas.drawRect(0,0,dWidth, dHeight, backgroundPaint);
         // print the paths according to the maze
         for (Path p : paths) {
-            canvas.drawBitmap(pathBitmap, null, p.rectPath, null);
+            canvas.drawBitmap(p.path, null, p.rectPath, null);
         }
         // draw cat
         canvas.drawBitmap(cat, null, rectCat, null);
@@ -283,6 +294,19 @@ public class GameView extends View {
                         }
                     }
                     // otherwise do nothing
+                }
+                if (maze0[catIndexY][catIndexX] == 3){
+                    // if end of maze, celebrate
+                    Intent intent = new Intent(context, GameWon.class);
+                    intent.putExtra("points", energy - optimalNumSteps);
+                    context.startActivity(intent);
+                    ((Activity) context).finish();
+                }
+                else if (energy <= 0) {
+                    // if energy is drained, gameover
+                    Intent intent = new Intent(context, GameOver.class);
+                    context.startActivity(intent);
+                    ((Activity) context).finish();
                 }
             }
             prevX = event.getX();
