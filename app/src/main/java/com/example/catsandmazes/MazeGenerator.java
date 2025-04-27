@@ -1,3 +1,4 @@
+//with updated aldous
 package com.example.catsandmazes;
 
 import java.util.*;
@@ -96,7 +97,7 @@ public class MazeGenerator
 
     private int[][] generateAldousBroder() 
     {
-        int r = 0, c = 0; // Updated: Start at the top-left corner
+        int r = 0, c = 0; // Start at the top-left corner
         maze[r][c] = 0;
         int unvisitedCount = (rows / 2) * (cols / 2) - 1; // Count of unvisited cells
 
@@ -110,16 +111,21 @@ public class MazeGenerator
             {
                 if (maze[nr][nc] == 1) 
                 {
+                    // Connect the current cell to the new cell
                     maze[nr][nc] = 0;
                     maze[r + dir[0] / 2][c + dir[1] / 2] = 0; // Connect cells
                     unvisitedCount--;
                 }
-                r = nr;
-                c = nc; // Move to the next cell
-            } else 
+                r = nr; // Move to the next cell
+                c = nc;
+            } 
+            else 
             {
-                r = rand.nextInt(rows);
-                c = rand.nextInt(cols); // Pick a random cell
+                // If the move is out of bounds, pick another random unvisited cell
+                do {
+                    r = rand.nextInt(rows);
+                    c = rand.nextInt(cols);
+                } while (maze[r][c] == 0 || r % 2 == 0 || c % 2 == 0);
             }
         }
 
