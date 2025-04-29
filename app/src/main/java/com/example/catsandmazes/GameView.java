@@ -1,7 +1,10 @@
 package com.example.catsandmazes;
 
+import static android.provider.Settings.System.getString;
+
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -90,7 +93,31 @@ public class GameView extends View {
         super(context);
         this.context = context;
 
-        MazeGenerator generator = new MazeGenerator("Medium");
+        /*
+        SharedPreferences prefs = getSharedPreferences("game_settings", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("difficulty_index", difficultyIndex);
+        editor.apply();
+         */
+
+        // get difficulty
+        SharedPreferences sp = context.getSharedPreferences("game_settings", Context.MODE_PRIVATE);
+        int diff = sp.getInt("difficulty_index", 0);
+        String diffString = new String();
+
+        switch (diff){
+            case 0:
+                diffString = "Easy";
+                break;
+            case 1:
+                diffString = "Medium";
+                break;
+            case 2:
+                diffString = "Hard";
+        }
+
+
+        MazeGenerator generator = new MazeGenerator(diffString);
         maze0 = generator.generateMaze();
 
         FloodFill solve = new FloodFill(maze0);
