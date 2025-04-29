@@ -1,21 +1,3 @@
-/*
-Hi
-Right now I need to finish the following functionality
-    Allow user to move cat using arrows DONE!!!
-        Decrement energy as you go DONE!!!
-        TODO: OPTIMIZE CODE SO THAT IT RUNS SMOOTHER
-        I just don't like that it takes a while to jump
-    allow user to drag the background to look ahead. CONDITIONAL DONE!!!
-        TODO: OPTIMIZE CODE SO THAT IT RUNS SMOOTHER
-    Create new sprite for the end of the maze (w a fish xd)
-    Once cat is on top of final
-        Show most optimal route
-        Show victory layout
-    Energy == 0
-        Show most optimal route
-        Show losing layout
- */
-
 package com.example.catsandmazes;
 
 import android.app.Activity;
@@ -42,7 +24,10 @@ import java.util.Random;
 
 public class GameView extends View {
     // hardcoded mazes
-    int[][] mazeSolution = new int[10][10];
+    boolean isWon = false;
+    boolean isOver = false;
+    Node[] mazeSolutionNodes;
+    int[][] mazeSolution;
     int[][] maze0;
     /*
     int[][] maze0 = {
@@ -58,17 +43,22 @@ public class GameView extends View {
             {0,0,1,1,1,1,0,0,0,0}
     };
     */
-    int[][] maze1 = {
+    /*
+    int[][] maze0 = {
             {2, 1, 1},
             {1, 0, 1},
             {0, 0, 3}
     };
+    */
 
     // Bitmaps
-    Bitmap background, cat, pathBitmap, pathFinalBitmap, lightningBitmap, arrowLeft, arrowRight, arrowDown, arrowUp;
+    Bitmap paw, forwardBitmap, background, cat, pathBitmap, pathFinalBitmap, lightningBitmap, arrowLeft, arrowRight, arrowDown, arrowUp;
 
     // sounds. rand var used to rotate sounds
     MediaPlayer[] mpHappy = new MediaPlayer[3];
+    MediaPlayer[] mpWin = new MediaPlayer[3];
+    MediaPlayer mpOver;
+
     Random rand = new Random();
 
     // Coordinates
@@ -78,7 +68,7 @@ public class GameView extends View {
     float prevY;
 
     // reference rectangles
-    Rect rectBackground, rectCat, rectPath, rectLightning, rectLeft, rectRight, rectDown, rectUp, rectArrows;
+    Rect rectForward, rectPaw, rectBackground, rectCat, rectPath, rectLightning, rectLeft, rectRight, rectDown, rectUp, rectArrows;
     Context context;
     Handler handler;
     final long UPDATE_MILLS = 30;
@@ -90,6 +80,7 @@ public class GameView extends View {
     static int dWidth, dHeight;
     // array to store path instances
     ArrayList<Path> paths;
+    ArrayList<Paw> paws;
     Runnable runnable;
     // paints
     Paint textPaint = new Paint();
@@ -99,28 +90,28 @@ public class GameView extends View {
         super(context);
         this.context = context;
 
-        MazeGenerator generator = new MazeGenerator("Easy");
+        MazeGenerator generator = new MazeGenerator("Medium");
         maze0 = generator.generateMaze();
-        int[] temp = new int[maze0[0].length];
-        for(int[] row : maze0) {
-            for (int element : row) {
 
-                Log.d("MazeGenerator", element + " ");
-            }
-            Log.d("MazeGenerator", "\n");
-        }
-        /*FloodFill solve = new FloodFill(maze0);
-        //mazeSolution = solve.getSolution();
-        optimalNumSteps = solve.solve_maze();
+        FloodFill solve = new FloodFill(maze0);
+        mazeSolutionNodes = solve.solve();
+
+        optimalNumSteps = mazeSolutionNodes.length;
         energy =  (int) (optimalNumSteps* 1.5);
-        */
 
 
         // initialize Sounds
         mpHappy[0] = MediaPlayer.create(context, R.raw.happycat0);
         mpHappy[1] = MediaPlayer.create(context, R.raw.happycat1);
         mpHappy[2] = MediaPlayer.create(context, R.raw.happycat);
+        mpWin[0] = MediaPlayer.create(context, R.raw.victorycat0);
+        mpWin[1] = MediaPlayer.create(context, R.raw.victorycat1);
+        mpWin[2] = MediaPlayer.create(context, R.raw.victorycat2);
+        mpOver = MediaPlayer.create(context, R.raw.sadcat);
+
         // initialize Bitmaps
+        forwardBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.fast_forward_circle_fill);
+        paw = BitmapFactory.decodeResource(getResources(), R.drawable.catpaw);
         cat = BitmapFactory.decodeResource(getResources(), R.drawable.cat_sprite);
         pathBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grass_sprite_3d);
         lightningBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.lightning_charge_fill);
@@ -137,15 +128,17 @@ public class GameView extends View {
         dHeight = size.y;
         Log.d("debug", dWidth + " " + dHeight);
         // initialize reference rectangle
+        rectForward = new Rect(dWidth-dWidth/4, 0, dWidth, dWidth/4);
         rectBackground = new Rect(0,0, dWidth, dHeight);
         rectCat = new Rect(0,0, dWidth/4, dWidth*2363/(4*1796));
+        rectPaw = new Rect(0,0, dWidth/8, dWidth*1235/(8*1373));
         rectPath = new Rect(0,200, dWidth/4, 200+dWidth*235/1568);
         rectLightning = new Rect(0, 20, dWidth/9,20+dWidth/9);
-        rectDown = new Rect(dWidth-dWidth*2/9, dHeight-dWidth/9, dWidth-dWidth/9,dHeight);
-        rectUp = new Rect(dWidth-dWidth*2/9, dHeight-dWidth*3/9, dWidth-dWidth/9,dHeight-dWidth*2/9);
-        rectLeft = new Rect(dWidth-dWidth*3/9, dHeight-dWidth*2/9, dWidth-dWidth*2/9,dHeight-dWidth/9);
-        rectRight = new Rect(dWidth-dWidth/9, dHeight-dWidth*2/9, dWidth,dHeight-dWidth/9);
-        rectArrows = new Rect(dWidth-dWidth*3/9, dHeight-dWidth*3/9, dWidth, dHeight);
+        rectDown = new Rect(dWidth-dWidth*2/9, dHeight-dWidth*2/9, dWidth-dWidth/9,dHeight-dWidth/9);
+        rectUp = new Rect(dWidth-dWidth*2/9, dHeight-dWidth*4/9, dWidth-dWidth/9,dHeight-dWidth*3/9);
+        rectLeft = new Rect(dWidth-dWidth*3/9, dHeight-dWidth*3/9, dWidth-dWidth*2/9,dHeight-dWidth*2/9);
+        rectRight = new Rect(dWidth-dWidth/9, dHeight-dWidth*3/9, dWidth,dHeight-dWidth*2/9);
+        rectArrows = new Rect(dWidth-dWidth*3/9, dHeight-dWidth*4/9, dWidth, dHeight-dWidth/9);
 
         handler = new Handler();
         runnable = new Runnable() {
@@ -164,14 +157,29 @@ public class GameView extends View {
         catX = dWidth / 2 - cat.getWidth() /2;
         catY = dHeight/2 - cat.getHeight() / 2;
         paths = new ArrayList<>();
+        paws = new ArrayList<>();
+
+        // Initialize the paws (optimal route markers)
+        int pawX = 0;
+        int pawY = dHeight/5;
+        mazeSolution = new int[maze0[0].length][maze0[0].length]; // maze is square
+        for (Node e : mazeSolutionNodes) {
+            mazeSolution[e.y][e.x] = 1;
+            Log.d("TOUCHED", "paw created: " + e.y + ", " + e.x);
+        }
+
         // initialise number of paths
         int previousX = 0;
         int pathX = 0;
         int pathY = dHeight/5;
         for (int i = 0, l = maze0.length; i < l; i++) {
-            for (int j = 0, w = maze0[i].length; j < w; j++ ) {
+            for (int j = 0, w = maze0[i].length; j < w; j++) {
                 if (j == 0){
                     previousX = pathX;
+                }
+                if (mazeSolution[i][j] > 0) {
+                    paws.add(new Paw(context, paw, pathX, pathY, dWidth));
+                    Log.d("TOUCHED", "I'm inside the loop");
                 }
                 if(maze0[i][j] == 1) {
                     paths.add(new Path(context, pathBitmap, pathX, pathY, dWidth, maze0[i][j]));
@@ -205,6 +213,14 @@ public class GameView extends View {
         for (Path p : paths) {
             canvas.drawBitmap(p.path, null, p.rectPath, null);
         }
+        // if won/Gameover display optimal route
+        if (isWon || isOver) {
+            for (Paw pa : paws) {
+                canvas.drawBitmap(pa.paw,null, pa.rectPaw, null);
+            }
+            // Display button to continue
+            canvas.drawBitmap(forwardBitmap, null, rectForward, null);
+        }
         // draw cat
         canvas.drawBitmap(cat, null, rectCat, null);
         //draw energy
@@ -226,6 +242,26 @@ public class GameView extends View {
         float shiftY;
         int action = event.getAction();
         if (action == MotionEvent.ACTION_DOWN) {
+            // if won/gameover allow to click continue
+            if (isWon) {
+                if(rectForward.contains((int) x, (int) y)) {
+                    int temp = rand.nextInt(2);
+                    mpWin[temp].start();
+                    // if end of maze, celebrate
+                    Intent intent = new Intent(context, GameWon.class);
+                    //intent.putExtra("points", energy - optimalNumSteps);
+                    context.startActivity(intent);
+                    ((Activity) context).finish();
+                }
+            }
+            if (isOver) {
+                if(rectForward.contains((int) x, (int) y)) {
+                    mpOver.start();
+                    Intent intent = new Intent(context, GameOver.class);
+                    context.startActivity(intent);
+                    ((Activity) context).finish();
+                }
+            }
             //Check if the x and y position of the touch is inside the bitmap
             if (rectArrows.contains((int) x, (int) y)) {
                 int temp = rand.nextInt(2);
@@ -236,7 +272,8 @@ public class GameView extends View {
                     // move cat
                     if (catIndexY + 1 < maze0.length && catIndexY + 1 >= 0) {
                         if (maze0[catIndexY+1][catIndexX] > 0) {
-                            energy--;
+                            if (!isOver && !isWon)
+                                energy--;
                             catIndexY++;
                             catX -= dWidth/12;
                             catY += dWidth*27/224;
@@ -253,7 +290,8 @@ public class GameView extends View {
                     // move cat
                     if (catIndexY - 1 < maze0.length && catIndexY - 1 >= 0){
                         if (maze0[catIndexY-1][catIndexX] > 0) {
-                            energy--;
+                            if (!isOver && !isWon)
+                                energy--;
                             catIndexY--;
                             catX += dWidth/12;
                             catY -= dWidth*27/224;
@@ -270,7 +308,8 @@ public class GameView extends View {
                     // move cat
                     if (catIndexX - 1 < maze0[0].length && catIndexX - 1 >= 0) {
                         if (maze0[catIndexY][catIndexX-1] > 0) {
-                            energy--;
+                            if (!isOver && !isWon)
+                                energy--;
                             catIndexX--;
                             catX -= dWidth/4;
                             rectCat.set(catX,catY, catX+dWidth/4, catY+dWidth*2363/(4*1796));
@@ -286,7 +325,8 @@ public class GameView extends View {
                     // move cat
                     if (catIndexX + 1 < maze0[0].length && catIndexX + 1 >= 0){
                         if (maze0[catIndexY][catIndexX+1] > 0) {
-                            energy--;
+                            if (!isOver && !isWon)
+                                energy--;
                             catIndexX++;
                             catX += dWidth/4;
                             rectCat.set(catX,catY, catX+dWidth/4, catY+dWidth*2363/(4*1796));
@@ -295,18 +335,13 @@ public class GameView extends View {
                     }
                     // otherwise do nothing
                 }
-                if (maze0[catIndexY][catIndexX] == 3){
-                    // if end of maze, celebrate
-                    Intent intent = new Intent(context, GameWon.class);
-                    intent.putExtra("points", energy - optimalNumSteps);
-                    context.startActivity(intent);
-                    ((Activity) context).finish();
+                if (maze0[catIndexY][catIndexX] == 3 && !isOver){
+                    // Display Optimal route
+                    isWon = true;
                 }
-                else if (energy <= 0) {
+                else if (energy <= 0 && !isWon) {
                     // if energy is drained, gameover
-                    Intent intent = new Intent(context, GameOver.class);
-                    context.startActivity(intent);
-                    ((Activity) context).finish();
+                    isOver = true;
                 }
             }
             prevX = event.getX();
@@ -317,8 +352,8 @@ public class GameView extends View {
         if (action == MotionEvent.ACTION_MOVE) {
             Log.d("TOUCHED", "Scrool. X: " + x + " Y: " + y + "PrevX:" + prevX);
             // get movement
-            shiftX = (prevX - x)/2;
-            shiftY = (prevY - y)/2;
+            shiftX = (prevX - x)/10;
+            shiftY = (prevY - y)/10;
 
             Log.d("TOUCHED", "Shift: " + shiftX);
             // let's focus on x displacement
@@ -332,7 +367,14 @@ public class GameView extends View {
                 p.pathY -= (int) shiftY;
                 p.rectPath.set(p.pathX, p.pathY, p.pathX+dWidth/4, p.pathY+dWidth*235/1568);
             }
+            for (Paw pa : paws) {
+                pa.pawX -= (int) shiftX;
+                pa.pawY -= (int) shiftY;
+                pa.rectPaw.set(pa.pawX, pa.pawY, pa.pawX+dWidth/10, pa.pawY+dWidth*1235/(10*1373));
+            }
         }
         return true;
     }
 }
+
+

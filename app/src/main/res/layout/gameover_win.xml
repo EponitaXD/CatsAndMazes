@@ -48,7 +48,18 @@
         android:textSize="32sp"
         android:textColor="@android:color/white"
         android:backgroundTint="#2B85B8"
+        android:onClick="startGame" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Menu"
+        android:fontFamily="@font/caveatbrushregular"
+        android:textSize="32sp"
+        android:textColor="@android:color/white"
+        android:backgroundTint="#2B85B8"
         android:onClick="MainMenu" />
+
     <Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
