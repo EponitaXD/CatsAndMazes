@@ -1,7 +1,5 @@
 package com.example.catsandmazes;
 
-import static android.provider.Settings.System.getString;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -120,7 +118,7 @@ public class GameView extends View {
         MazeGenerator generator = new MazeGenerator(diffString);
         maze0 = generator.generateMaze();
 
-        FloodFill solve = new FloodFill(maze0);
+        MazeSolver solve = new MazeSolver(maze0);
         mazeSolutionNodes = solve.solve();
 
         optimalNumSteps = mazeSolutionNodes.length;

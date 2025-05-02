@@ -7,7 +7,7 @@ import java.util.HashMap;
 /*
  * This is the class to solve the maze
  */
-public class FloodFill {
+public class MazeSolver {
 
     private final int[][] maze;
 
@@ -16,7 +16,7 @@ public class FloodFill {
     private final HashMap<Node, Node> prevNodeTable;
     private final ArrayList<Node> unvisited;
 
-    public FloodFill(int[][] maze) {
+    public MazeSolver(int[][] maze) {
         this.maze = maze;
         pathTable = new HashMap<Node, Integer>(); // Maps nodes to their distance from the source
         prevNodeTable = new HashMap<Node, Node>(); // Maps nodes to their previous node
